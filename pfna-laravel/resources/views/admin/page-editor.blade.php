@@ -8,8 +8,8 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="/site/css/style.css?v=3">
-    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=5">
+    <link rel="stylesheet" href="/site/css/style.css?v=4">
+    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=6">
 </head>
 <body class="page-editor-body">
     <div class="editor-toolbar">
@@ -18,9 +18,9 @@
         <button type="button" data-command="italic"><i>I</i></button>
         <button type="button" data-command="createLink">Link</button>
         <button type="button" id="replaceMediaBtn">Đổi ảnh/video</button>
-        <button type="button" id="replaceIconBtn">Đổi icon</button>
+        <button type="button" id="replaceIconBtn">Đổi icon bằng tên</button>
         <button type="button" id="replaceCvBtn">Đổi file CV từ máy tính</button>
-        <span id="editorStatus">Bấm vào text để sửa trực tiếp.</span>
+        <span id="editorStatus">Bấm vào text để sửa trực tiếp. Bấm vào icon rồi chọn Đổi ảnh/video nếu muốn upload ảnh thay icon.</span>
         <button type="button" class="admin-primary" id="savePageBtn">Lưu website</button>
     </div>
     <input type="file" id="mediaInput" hidden accept="image/*,video/*,.pdf">
@@ -37,6 +37,6 @@
         };
     </script>
     <script src="/site/js/script.js?v=2"></script>
-    <script src="/cms-admin-assets/page-editor.js?v=6"></script>
+    <script src="/cms-admin-assets/page-editor.js?v=7"></script>
 </body>
 </html>

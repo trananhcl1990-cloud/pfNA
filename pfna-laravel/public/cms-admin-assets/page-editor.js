@@ -25,15 +25,7 @@
     ].join(',');
 
     page.querySelectorAll(editableSelector).forEach((element) => {
-        if (element.closest(skipSelector)) {
-            return;
-        }
-
-        if (hasEditableChild(element)) {
-            return;
-        }
-
-        if (!hasOwnText(element)) {
+        if (element.closest(skipSelector) || hasEditableChild(element) || !hasOwnText(element)) {
             return;
         }
 
@@ -41,7 +33,7 @@
         element.classList.add('cms-editable-text');
 
         element.addEventListener('focus', () => {
-            status.textContent = 'Dang sua text. Bam Luu website khi hoan tat.';
+            status.textContent = 'Đang sửa text. Bấm Lưu website khi hoàn tất.';
         });
 
         element.addEventListener('click', (event) => {
@@ -75,38 +67,21 @@
                 return;
             }
 
-            const href = prompt('Nhap link moi:', link.getAttribute('href') || '');
+            const href = prompt('Nhập link mới:', link.getAttribute('href') || '');
             if (href !== null) {
                 link.setAttribute('href', href);
             }
         });
     });
 
-    page.querySelectorAll('img,video').forEach((media) => {
-        media.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            selectMedia(media);
-        });
-    });
-
-    page.querySelectorAll('ion-icon').forEach((icon) => {
-        if (icon.closest(skipSelector)) {
-            return;
-        }
-
-        icon.addEventListener('click', (event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            selectIcon(icon);
-        });
-    });
+    page.querySelectorAll('img,video').forEach(bindMediaPicker);
+    page.querySelectorAll('ion-icon').forEach(bindIconPicker);
 
     document.querySelectorAll('[data-command]').forEach((button) => {
         button.addEventListener('click', () => {
             const command = button.dataset.command;
             if (command === 'createLink') {
-                const url = prompt('Nhap URL:');
+                const url = prompt('Nhập URL:');
                 if (url) document.execCommand(command, false, url);
                 return;
             }
@@ -115,10 +90,11 @@
     });
 
     document.getElementById('replaceMediaBtn').addEventListener('click', () => {
-        if (!selectedMedia) {
-            status.textContent = 'Hãy bấm chọn một ảnh hoặc video trước.';
+        if (!selectedMedia && !selectedIcon) {
+            status.textContent = 'Hãy bấm chọn một ảnh, video hoặc icon trước.';
             return;
         }
+
         fileInput.click();
     });
 
@@ -135,7 +111,7 @@
         }
 
         selectedIcon.setAttribute('name', nextName.trim());
-        status.textContent = 'Đã đổi icon. Bấm Lưu website để ghi lại.';
+        status.textContent = 'Đã đổi icon bằng tên. Bấm Lưu website để ghi lại.';
     });
 
     document.getElementById('replaceCvBtn').addEventListener('click', () => {
@@ -143,10 +119,37 @@
     });
 
     fileInput.addEventListener('change', async () => {
-        if (!fileInput.files.length || !selectedMedia) return;
-        const url = await upload(fileInput.files[0]);
-        selectedMedia.setAttribute('src', url);
-        status.textContent = 'Da doi media. Bam Luu website de ghi lai.';
+        if (!fileInput.files.length) return;
+
+        const file = fileInput.files[0];
+        const url = await upload(file);
+
+        if (selectedIcon) {
+            if (!file.type.startsWith('image/')) {
+                status.textContent = 'Icon chỉ đổi được bằng file ảnh.';
+                fileInput.value = '';
+                return;
+            }
+
+            const image = document.createElement('img');
+            image.setAttribute('src', url);
+            image.setAttribute('alt', selectedIcon.getAttribute('name') || 'Icon');
+            image.className = 'cms-replaceable-icon';
+            selectedIcon.replaceWith(image);
+            bindMediaPicker(image);
+            selectedIcon = null;
+            selectedMedia = image;
+            image.classList.add('cms-selected-media');
+            status.textContent = 'Đã đổi icon thành ảnh. Bấm Lưu website để ghi lại.';
+            fileInput.value = '';
+            return;
+        }
+
+        if (selectedMedia) {
+            selectedMedia.setAttribute('src', url);
+            status.textContent = 'Đã đổi media. Bấm Lưu website để ghi lại.';
+        }
+
         fileInput.value = '';
     });
 
@@ -181,7 +184,6 @@
         });
         cleanPastedFormatting();
 
-        const html = page.innerHTML;
         const response = await fetch(window.cmsRoutes.savePage, {
             method: 'POST',
             headers: {
@@ -189,7 +191,7 @@
                 'X-CSRF-TOKEN': window.cmsRoutes.csrf,
                 'Accept': 'application/json',
             },
-            body: JSON.stringify({ html }),
+            body: JSON.stringify({ html: page.innerHTML }),
         });
 
         if (!response.ok) {
@@ -200,6 +202,26 @@
         status.textContent = 'Đã lưu website.';
         window.setTimeout(() => window.location.reload(), 700);
     });
+
+    function bindMediaPicker(media) {
+        media.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            selectMedia(media);
+        });
+    }
+
+    function bindIconPicker(icon) {
+        if (icon.closest(skipSelector)) {
+            return;
+        }
+
+        icon.addEventListener('click', (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            selectIcon(icon);
+        });
+    }
 
     function hasEditableChild(element) {
         return Array.from(element.children).some((child) => {
@@ -240,7 +262,7 @@
         selectedIcon = icon;
         selectedMedia = null;
         icon.classList.add('cms-selected-icon');
-        status.textContent = 'Đã chọn icon "' + (icon.getAttribute('name') || '') + '". Bấm Đổi icon để sửa.';
+        status.textContent = 'Đã chọn icon "' + (icon.getAttribute('name') || '') + '". Bấm Đổi ảnh/video để upload ảnh thay icon, hoặc Đổi icon bằng tên.';
     }
 
     async function upload(file) {

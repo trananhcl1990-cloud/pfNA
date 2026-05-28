@@ -1011,6 +1011,15 @@ header::before {
     font-size: 1.5rem;
 }
 
+.category-icon img,
+.method-icon img,
+.tech-item img.cms-replaceable-icon {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    display: block;
+}
+
 .category-header h3 {
     font-size: 1.3rem;
     font-weight: 700;
@@ -1107,6 +1116,11 @@ header::before {
 .tech-item ion-icon {
     font-size: 2rem;
     color: var(--primary-color);
+}
+
+.tech-item img.cms-replaceable-icon {
+    width: 2rem;
+    height: 2rem;
 }
 
 .tech-item span {
