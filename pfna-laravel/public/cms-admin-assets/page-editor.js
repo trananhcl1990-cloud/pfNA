@@ -37,6 +37,14 @@
             status.textContent = 'Dang sua text. Bam Luu website khi hoan tat.';
         });
 
+        element.addEventListener('input', () => {
+            syncTranslationAttribute(element);
+        });
+
+        element.addEventListener('blur', () => {
+            syncTranslationAttribute(element);
+        });
+
         element.addEventListener('click', (event) => {
             event.stopPropagation();
         });
@@ -232,6 +240,8 @@
     }
 
     function prepareForSave() {
+        syncAllTranslationAttributes();
+
         const editableElements = Array.from(page.querySelectorAll('[contenteditable]'));
         const selectedMediaElements = Array.from(page.querySelectorAll('.cms-selected-media'));
         const selectedIconElements = Array.from(page.querySelectorAll('.cms-selected-icon'));
@@ -255,6 +265,43 @@
             selectedMediaElements.forEach((element) => element.classList.add('cms-selected-media'));
             selectedIconElements.forEach((element) => element.classList.add('cms-selected-icon'));
         };
+    }
+
+    function getCurrentLanguage() {
+        const stored = localStorage.getItem('portfolio-language');
+        if (['vi', 'en', 'zh'].includes(stored)) {
+            return stored;
+        }
+
+        const htmlLang = document.documentElement.lang;
+        if (htmlLang === 'zh-CN') {
+            return 'zh';
+        }
+
+        return ['vi', 'en', 'zh'].includes(htmlLang) ? htmlLang : 'vi';
+    }
+
+    function syncAllTranslationAttributes() {
+        page.querySelectorAll('[contenteditable]').forEach(syncTranslationAttribute);
+    }
+
+    function syncTranslationAttribute(element) {
+        const lang = getCurrentLanguage();
+        const attr = 'data-' + lang;
+
+        if (!element.hasAttribute(attr)) {
+            return;
+        }
+
+        element.setAttribute(attr, getEditableText(element));
+    }
+
+    function getEditableText(element) {
+        if (element.tagName === 'BR') {
+            return '';
+        }
+
+        return (element.innerText || element.textContent || '').trim();
     }
 
     function hasEditableChild(element) {

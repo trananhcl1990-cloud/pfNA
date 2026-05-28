@@ -36,6 +36,6 @@
         };
     </script>
     <script src="/site/js/script.js?v=2"></script>
-    <script src="/cms-admin-assets/page-editor.js?v=9"></script>
+    <script src="/cms-admin-assets/page-editor.js?v=10"></script>
 </body>
 </html>
