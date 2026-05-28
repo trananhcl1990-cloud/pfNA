@@ -119,6 +119,7 @@
             image.setAttribute('src', url);
             image.setAttribute('alt', selectedIcon.getAttribute('name') || 'Icon');
             image.className = 'cms-replaceable-icon';
+            image.setAttribute('loading', 'lazy');
             selectedIcon.replaceWith(image);
             bindMediaPicker(image);
             selectedIcon = null;
@@ -131,6 +132,9 @@
 
         if (selectedMedia) {
             selectedMedia.setAttribute('src', url);
+            if (selectedMedia.closest('.category-icon, .method-icon, .tech-item')) {
+                selectedMedia.classList.add('cms-replaceable-icon');
+            }
             status.textContent = 'Đã đổi media. Bấm Lưu website để ghi lại.';
         }
 
