@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ExperienceController;
 use App\Http\Controllers\Admin\PageEditorController;
 use App\Http\Controllers\Admin\PostController;
+use App\Http\Controllers\Admin\SectionContentController;
 use App\Http\Controllers\SiteController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/page', [PageEditorController::class, 'edit'])->name('page.edit');
         Route::post('/page', [PageEditorController::class, 'update'])->name('page.update');
         Route::post('/upload', [PageEditorController::class, 'upload'])->name('upload');
+        Route::get('/sections', [SectionContentController::class, 'edit'])->name('sections.edit');
+        Route::put('/sections', [SectionContentController::class, 'update'])->name('sections.update');
         Route::get('/cv', [CvController::class, 'edit'])->name('cv.edit');
         Route::post('/cv', [CvController::class, 'update'])->name('cv.update');
         Route::post('/cv/upload', [CvController::class, 'upload'])->name('cv.upload');

@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Admin' }} - pfNA CMS</title>
-    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=4">
+    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=9">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar">
         <h1>pfNA CMS</h1>
         <nav>
             <a href="{{ route('admin.dashboard') }}">Tổng quan</a>
+            <a href="{{ route('admin.sections.edit') }}">Nội dung các mục</a>
             <a href="{{ route('admin.page.edit') }}">Sửa trực tiếp website</a>
             <a href="{{ route('admin.cv.edit') }}">File CV</a>
             <a href="{{ route('admin.experiences.index') }}">Kinh nghiệm làm việc</a>
