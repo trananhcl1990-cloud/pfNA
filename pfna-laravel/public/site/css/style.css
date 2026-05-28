@@ -1054,17 +1054,11 @@ header::before {
 }
 
 .skill-percentage {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    font-weight: 600;
+    display: none !important;
 }
 
 .skill-bar {
-    height: 8px;
-    background: #e2e8f0;
-    border-radius: var(--radius-full);
-    overflow: hidden;
-    position: relative;
+    display: none !important;
 }
 
 .skill-progress {

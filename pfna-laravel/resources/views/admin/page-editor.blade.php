@@ -8,8 +8,8 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="/site/css/style.css?v=5">
-    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=7">
+    <link rel="stylesheet" href="/site/css/style.css?v=6">
+    <link rel="stylesheet" href="/cms-admin-assets/cms.css?v=8">
 </head>
 <body class="page-editor-body">
     <div class="editor-toolbar">
