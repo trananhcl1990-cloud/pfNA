@@ -18,9 +18,8 @@
         <button type="button" data-command="italic"><i>I</i></button>
         <button type="button" data-command="createLink">Link</button>
         <button type="button" id="replaceMediaBtn">Đổi ảnh/video</button>
-        <button type="button" id="replaceIconBtn">Đổi icon bằng tên</button>
         <button type="button" id="replaceCvBtn">Đổi file CV từ máy tính</button>
-        <span id="editorStatus">Bấm vào text để sửa trực tiếp. Bấm vào icon rồi chọn Đổi ảnh/video nếu muốn upload ảnh thay icon.</span>
+        <span id="editorStatus">Bấm vào text để sửa trực tiếp. Bấm vào icon rồi chọn Đổi ảnh/video để upload ảnh thay icon.</span>
         <button type="button" class="admin-primary" id="savePageBtn">Lưu website</button>
     </div>
     <input type="file" id="mediaInput" hidden accept="image/*,video/*,.pdf">
@@ -37,6 +36,6 @@
         };
     </script>
     <script src="/site/js/script.js?v=2"></script>
-    <script src="/cms-admin-assets/page-editor.js?v=7"></script>
+    <script src="/cms-admin-assets/page-editor.js?v=8"></script>
 </body>
 </html>

@@ -98,22 +98,6 @@
         fileInput.click();
     });
 
-    document.getElementById('replaceIconBtn').addEventListener('click', () => {
-        if (!selectedIcon) {
-            status.textContent = 'Hãy bấm chọn một icon trước.';
-            return;
-        }
-
-        const currentName = selectedIcon.getAttribute('name') || '';
-        const nextName = prompt('Nhập tên icon mới:', currentName);
-        if (!nextName) {
-            return;
-        }
-
-        selectedIcon.setAttribute('name', nextName.trim());
-        status.textContent = 'Đã đổi icon bằng tên. Bấm Lưu website để ghi lại.';
-    });
-
     document.getElementById('replaceCvBtn').addEventListener('click', () => {
         cvInput.click();
     });
@@ -262,7 +246,7 @@
         selectedIcon = icon;
         selectedMedia = null;
         icon.classList.add('cms-selected-icon');
-        status.textContent = 'Đã chọn icon "' + (icon.getAttribute('name') || '') + '". Bấm Đổi ảnh/video để upload ảnh thay icon, hoặc Đổi icon bằng tên.';
+        status.textContent = 'Đã chọn icon. Bấm Đổi ảnh/video để upload ảnh thay icon.';
     }
 
     async function upload(file) {
