@@ -5,6 +5,7 @@
     const cvInput = document.getElementById('cvInput');
     let selectedMedia = null;
     let selectedIcon = null;
+    let saving = false;
 
     const editableSelector = 'h1,h2,h3,h4,h5,h6,p,li,blockquote,span,label,a,figcaption,td,th';
     const skipSelector = [
@@ -33,7 +34,7 @@
         element.classList.add('cms-editable-text');
 
         element.addEventListener('focus', () => {
-            status.textContent = 'Đang sửa text. Bấm Lưu website khi hoàn tất.';
+            status.textContent = 'Dang sua text. Bam Luu website khi hoan tat.';
         });
 
         element.addEventListener('click', (event) => {
@@ -67,7 +68,7 @@
                 return;
             }
 
-            const href = prompt('Nhập link mới:', link.getAttribute('href') || '');
+            const href = prompt('Nhap link moi:', link.getAttribute('href') || '');
             if (href !== null) {
                 link.setAttribute('href', href);
             }
@@ -81,7 +82,7 @@
         button.addEventListener('click', () => {
             const command = button.dataset.command;
             if (command === 'createLink') {
-                const url = prompt('Nhập URL:');
+                const url = prompt('Nhap URL:');
                 if (url) document.execCommand(command, false, url);
                 return;
             }
@@ -91,7 +92,7 @@
 
     document.getElementById('replaceMediaBtn').addEventListener('click', () => {
         if (!selectedMedia && !selectedIcon) {
-            status.textContent = 'Hãy bấm chọn một ảnh, video hoặc icon trước.';
+            status.textContent = 'Hay bam chon anh, video hoac icon truoc.';
             return;
         }
 
@@ -105,90 +106,71 @@
     fileInput.addEventListener('change', async () => {
         if (!fileInput.files.length) return;
 
-        const file = fileInput.files[0];
-        const url = await upload(file);
+        try {
+            const file = fileInput.files[0];
+            const url = await upload(file);
 
-        if (selectedIcon) {
-            if (!file.type.startsWith('image/')) {
-                status.textContent = 'Icon chỉ đổi được bằng file ảnh.';
+            if (selectedIcon) {
+                if (!file.type.startsWith('image/')) {
+                    status.textContent = 'Icon chi doi duoc bang file anh.';
+                    fileInput.value = '';
+                    return;
+                }
+
+                const image = document.createElement('img');
+                image.setAttribute('src', url);
+                image.setAttribute('alt', selectedIcon.getAttribute('name') || 'Icon');
+                image.setAttribute('loading', 'lazy');
+                image.className = 'cms-replaceable-icon';
+                selectedIcon.replaceWith(image);
+                bindMediaPicker(image);
+                selectedIcon = null;
+                selectedMedia = image;
+                image.classList.add('cms-selected-media');
+                status.textContent = 'Da doi icon thanh anh. Dang tu dong luu...';
+                await savePage({ reload: false });
                 fileInput.value = '';
                 return;
             }
 
-            const image = document.createElement('img');
-            image.setAttribute('src', url);
-            image.setAttribute('alt', selectedIcon.getAttribute('name') || 'Icon');
-            image.className = 'cms-replaceable-icon';
-            image.setAttribute('loading', 'lazy');
-            selectedIcon.replaceWith(image);
-            bindMediaPicker(image);
-            selectedIcon = null;
-            selectedMedia = image;
-            image.classList.add('cms-selected-media');
-            status.textContent = 'Đã đổi icon thành ảnh. Bấm Lưu website để ghi lại.';
-            fileInput.value = '';
-            return;
-        }
-
-        if (selectedMedia) {
-            selectedMedia.setAttribute('src', url);
-            if (selectedMedia.closest('.category-icon, .method-icon, .tech-item')) {
-                selectedMedia.classList.add('cms-replaceable-icon');
+            if (selectedMedia) {
+                selectedMedia.setAttribute('src', url);
+                if (selectedMedia.closest('.category-icon, .method-icon, .tech-item')) {
+                    selectedMedia.classList.add('cms-replaceable-icon');
+                }
+                status.textContent = 'Da doi media. Dang tu dong luu...';
+                await savePage({ reload: false });
             }
-            status.textContent = 'Đã đổi media. Bấm Lưu website để ghi lại.';
+        } catch (error) {
+            status.textContent = 'Upload hoac luu that bai: ' + error.message;
+        } finally {
+            fileInput.value = '';
         }
-
-        fileInput.value = '';
     });
 
     cvInput.addEventListener('change', async () => {
         if (!cvInput.files.length) return;
 
-        status.textContent = 'Đang upload file CV từ máy tính...';
-        const result = await uploadCv(cvInput.files[0]);
-        const cvLink = findCvLink();
+        try {
+            status.textContent = 'Dang upload file CV tu may tinh...';
+            const result = await uploadCv(cvInput.files[0]);
+            const cvLink = findCvLink();
 
-        if (cvLink) {
-            cvLink.setAttribute('href', result.url);
+            if (cvLink) {
+                cvLink.setAttribute('href', result.url);
+            }
+
+            status.textContent = 'Da doi file CV: ' + result.name + '. Dang tu dong luu...';
+            await savePage({ reload: false });
+        } catch (error) {
+            status.textContent = 'Doi file CV that bai: ' + error.message;
+        } finally {
+            cvInput.value = '';
         }
-
-        status.textContent = 'Đã đổi file CV: ' + result.name + '. Nút Tải CV sẽ dùng file mới.';
-        cvInput.value = '';
     });
 
-    document.getElementById('savePageBtn').addEventListener('click', async () => {
-        page.querySelectorAll('[contenteditable]').forEach((element) => {
-            element.removeAttribute('contenteditable');
-            element.classList.remove('cms-editable-text');
-        });
-        page.querySelectorAll('.cms-selected-media').forEach((element) => {
-            element.classList.remove('cms-selected-media');
-        });
-        page.querySelectorAll('.cms-selected-icon').forEach((element) => {
-            element.classList.remove('cms-selected-icon');
-        });
-        page.querySelectorAll('.typing-text').forEach((element) => {
-            element.textContent = '';
-        });
-        cleanPastedFormatting();
-
-        const response = await fetch(window.cmsRoutes.savePage, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': window.cmsRoutes.csrf,
-                'Accept': 'application/json',
-            },
-            body: JSON.stringify({ html: page.innerHTML }),
-        });
-
-        if (!response.ok) {
-            status.textContent = 'Lưu thất bại. Hãy thử lại.';
-            return;
-        }
-
-        status.textContent = 'Đã lưu website.';
-        window.setTimeout(() => window.location.reload(), 700);
+    document.getElementById('savePageBtn').addEventListener('click', () => {
+        savePage({ reload: true });
     });
 
     function bindMediaPicker(media) {
@@ -209,6 +191,70 @@
             event.stopPropagation();
             selectIcon(icon);
         });
+    }
+
+    async function savePage(options = {}) {
+        if (saving) return;
+        saving = true;
+        status.textContent = 'Dang luu website...';
+
+        const cleanup = prepareForSave();
+
+        try {
+            const response = await fetch(window.cmsRoutes.savePage, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': window.cmsRoutes.csrf,
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({ html: page.innerHTML }),
+            });
+
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
+
+            status.textContent = 'Da luu website.';
+            if (options.reload) {
+                window.setTimeout(() => window.location.reload(), 500);
+            } else {
+                cleanup();
+            }
+        } catch (error) {
+            cleanup();
+            status.textContent = 'Luu that bai: ' + error.message + '. Hay dang nhap lai admin neu bi 419.';
+            throw error;
+        } finally {
+            saving = false;
+        }
+    }
+
+    function prepareForSave() {
+        const editableElements = Array.from(page.querySelectorAll('[contenteditable]'));
+        const selectedMediaElements = Array.from(page.querySelectorAll('.cms-selected-media'));
+        const selectedIconElements = Array.from(page.querySelectorAll('.cms-selected-icon'));
+
+        editableElements.forEach((element) => {
+            element.removeAttribute('contenteditable');
+            element.classList.remove('cms-editable-text');
+        });
+        selectedMediaElements.forEach((element) => element.classList.remove('cms-selected-media'));
+        selectedIconElements.forEach((element) => element.classList.remove('cms-selected-icon'));
+        page.querySelectorAll('.typing-text').forEach((element) => {
+            element.textContent = '';
+        });
+        cleanPastedFormatting();
+
+        return () => {
+            editableElements.forEach((element) => {
+                element.setAttribute('contenteditable', 'true');
+                element.classList.add('cms-editable-text');
+            });
+            selectedMediaElements.forEach((element) => element.classList.add('cms-selected-media'));
+            selectedIconElements.forEach((element) => element.classList.add('cms-selected-icon'));
+        };
     }
 
     function hasEditableChild(element) {
@@ -237,7 +283,7 @@
         selectedMedia = media;
         selectedIcon = null;
         media.classList.add('cms-selected-media');
-        status.textContent = 'Đã chọn media. Bấm Đổi ảnh/video để upload file mới.';
+        status.textContent = 'Da chon media. Bam Doi anh/video de upload file moi.';
     }
 
     function selectIcon(icon) {
@@ -250,7 +296,7 @@
         selectedIcon = icon;
         selectedMedia = null;
         icon.classList.add('cms-selected-icon');
-        status.textContent = 'Đã chọn icon. Bấm Đổi ảnh/video để upload ảnh thay icon.';
+        status.textContent = 'Da chon icon. Bam Doi anh/video de upload anh thay icon.';
     }
 
     async function upload(file) {
@@ -259,6 +305,7 @@
 
         const response = await fetch(window.cmsRoutes.upload, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'X-CSRF-TOKEN': window.cmsRoutes.csrf,
                 'Accept': 'application/json',
@@ -267,7 +314,7 @@
         });
 
         if (!response.ok) {
-            throw new Error('Upload failed');
+            throw new Error('Upload HTTP ' + response.status);
         }
 
         return (await response.json()).url;
@@ -279,6 +326,7 @@
 
         const response = await fetch(window.cmsRoutes.uploadCv, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: {
                 'X-CSRF-TOKEN': window.cmsRoutes.csrf,
                 'Accept': 'application/json',
@@ -287,7 +335,7 @@
         });
 
         if (!response.ok) {
-            throw new Error('CV upload failed');
+            throw new Error('CV upload HTTP ' + response.status);
         }
 
         return response.json();
