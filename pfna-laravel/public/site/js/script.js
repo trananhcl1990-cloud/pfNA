@@ -489,6 +489,16 @@ function createLanguageController(typingAnimation) {
     };
 }
 
+function removeLegacyJavaSkill() {
+    document.querySelectorAll('#skills .skill-item').forEach((item) => {
+        const name = item.querySelector('.skill-name')?.textContent.trim().toLowerCase();
+
+        if (name === 'java') {
+            item.remove();
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const typingElement = document.querySelector('.typing-text');
     const typingAnimation = typingElement ? new TypingAnimation(typingElement, TYPING_TEXTS[DEFAULT_LANGUAGE]) : null;
@@ -509,6 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     languageController.init();
+    removeLegacyJavaSkill();
 
     const projectCards = document.querySelectorAll('.project-card');
     projectCards.forEach((card, index) => {

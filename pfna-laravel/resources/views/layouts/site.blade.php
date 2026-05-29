@@ -13,6 +13,6 @@
 </head>
 <body>
     @yield('content')
-    <script src="/site/js/script.js?v=2"></script>
+    <script src="/site/js/script.js?v=3"></script>
 </body>
 </html>
