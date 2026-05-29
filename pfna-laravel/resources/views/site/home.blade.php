@@ -1,4 +1,4 @@
-@extends('layouts.site', ['title' => 'Nguyễn Gia Huy'])
+@extends('layouts.site', ['title' => 'Vũ Hồng Ánh Portfolio'])
 
 @section('content')
     {!! $pageHtml !!}
